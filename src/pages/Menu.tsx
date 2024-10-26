@@ -1,8 +1,10 @@
 import PlayerCard from "@/components/PlayerCard";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from 'react';
 
 function Menu() {
   const navigate = useNavigate();
+  const [placar, setPlacar] = useState([{id: 0, username: "", score: 0}])
 
   const fake_users = [
     { id: 0, username: "Joao Gabriel Vianna", score: 1000 },
@@ -13,8 +15,26 @@ function Menu() {
     { id: 5, username: "Aika Sabrina", score: 500 },
   ];
 
+  useEffect(() => {
+    fetch('http://localhost:3000/placar')
+    .then((response) => response.json())
+    .then((data) => {
+      let placar_temp = [];
 
-  const rank_users = fake_users.sort((a, b) => b.score - a.score);
+      for (let i = 0; i < 5; i++) {
+        if (i < data.length) {
+          placar_temp.push({
+            id: i,
+            username: data[i][0],
+            score: data[i][1]
+          });
+        }
+      }
+      
+      setPlacar(placar_temp)
+    })
+    .catch((error) => console.error('Erro ao buscar dados:', error));
+  }, [])
 
   const StartGameButton = () => {
     navigate('/tutorial')
@@ -51,7 +71,7 @@ function Menu() {
           </h1>
         </header>
         <div className="flex flex-col gap-4">
-          {rank_users.map((user, index) => (
+          {placar.map((user, index) => (
             <PlayerCard key={user.id} username={user.username} score={user.score} rank={index + 1} />
           ))}
         </div>
