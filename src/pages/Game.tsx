@@ -14,7 +14,7 @@ const GameInfo = () => {
   const [error, setError] = useState<string | null>(null);
   const [round, setRound] = useState<HandKeys[]>([]);
   const [score, setScore] = useState(0);
-  const [currentIndex, setCurrentIndex] = useState(1);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [currentScore, setCurrentScore] = useState(0);
   useEffect(() => {
     const socket = new WebSocket(ENDPOINT);
@@ -31,15 +31,17 @@ const GameInfo = () => {
         if (jsonObject.body.rodada) {
           const desafios: Desafio[] = jsonObject.body.desafios;
           const letters = desafios.map((d) => d.nome);
+          setCurrentIndex(0)
           setCurrentScore(currentScore + 1)
           setRound(letters);
-          
-          const scores: number = jsonObject.body.score;
-          setScore(scores)
-          
-          setCurrentIndex((prevIndex) => Math.min(prevIndex + 1, letters.length - 1));
-
-
+        }
+        if (jsonObject.body.message) {
+          console.log(jsonObject.body.message)
+          if (jsonObject.body.message.toString() == "desafio_concluido") {
+            setCurrentIndex((prev) => prev + 1)
+            const scores: number = jsonObject.body.score;
+            setScore(scores)
+          }
         }
       } catch (error) {
         console.error("Erro ao converter mensagem para objeto:", error);
@@ -80,13 +82,13 @@ const GameInfo = () => {
                     src={handsModel[hand]}
                     alt={hand}
                     className="rounded-3xl transition-all duration-200"
-                    style={{ filter: index > currentScore ? "blur(30px)" : "none" }}
+                    style={{ filter: index > currentIndex - 1 ? "blur(40px)" : "none" }}
                   />
                 </div>
                 {index}
                 {currentIndex}
 
-                <div className={`w-10 h-10 rounded-full bg-graphite ${index <= currentScore ? "bg-primary" : ""} transition-all`}></div>
+                <div className={`w-10 h-10 rounded-full bg-graphite ${index < currentIndex ? "bg-primary" : ""} transition-all`}></div>
               </div>
             ))}
           </div>
