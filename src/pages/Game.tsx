@@ -1,65 +1,65 @@
-// src/components/GameInfo.js
+// src/components/GameInfo.tsx
 import handsModel, { HandKeys } from '@/models/handModel';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-const ENDPOINT = "ws://localhost:3000/websocket"; // Endpoint do WebSocket
+const ENDPOINT = "ws://localhost:3000/websocket";
+
+interface Desafio {
+  nome: "A" | "B" | "C" | "D" | "E";
+  status: boolean;
+  timer: number;
+}
 
 const GameInfo = () => {
-  const [gameInfos, setGameInfos] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState(null);
-  const [round, setRound] = useState<HandKeys[]>(["hand_L"]); // Defina round como um array de HandKeys
+  const [round, setRound] = useState<HandKeys[]>([]);
   const [score, setScore] = useState(0);
-  const [currentIndex, setCurrentIndex] = useState(0); // Índice do slider de rodadas
-
+  const [currentIndex, setCurrentIndex] = useState(1);
+  const [currentScore, setCurrentScore] = useState(0);
   useEffect(() => {
-    // Cria uma nova conexão WebSocket
     const socket = new WebSocket(ENDPOINT);
 
-    // Evento ao abrir a conexão
     socket.onopen = () => {
       console.log('Connected to WebSocket server');
     };
-
-    // Evento ao receber uma mensagem
+    setCurrentScore(0)
     socket.onmessage = (event) => {
+      
       console.log(`Received message:`, event.data);
-      setMessage(event.data);
-
-      try{
-        const jsonObject = JSON.parse(event.data)
+      try {
+        const jsonObject = JSON.parse(event.data);
         if (jsonObject.body.rodada) {
-          try {
-            setRound(jsonObject.body.rodada)
-          } catch (error) {
-            console.error("Erro ao tentar mudar a rodada >> " + error)
-          }
+          const desafios: Desafio[] = jsonObject.body.desafios;
+          const letters = desafios.map((d) => d.nome);
+          setCurrentScore(currentScore + 1)
+          setRound(letters);
+          
+          const scores: number = jsonObject.body.score;
+          setScore(scores)
+          
+          setCurrentIndex((prevIndex) => Math.min(prevIndex + 1, letters.length - 1));
+
+
         }
-      } catch (error){
-        console.error("Erro ao tentar converter mensagem para objeto >> " + error)
+      } catch (error) {
+        console.error("Erro ao converter mensagem para objeto:", error);
+        setError('Error parsing message');
       }
     };
 
-    // Evento ao encontrar um erro
     socket.onerror = (error) => {
       console.error('WebSocket error:', error);
       setError('WebSocket connection error');
     };
 
-    // Evento ao fechar a conexão
     socket.onclose = () => {
       console.log('WebSocket connection closed');
     };
 
-    // Limpeza ao desmontar o componente
     return () => {
       socket.close();
     };
   }, []);
-
-  // if (loading) return <div>Loading...</div>;
-  // if (error) return <div>Error: {error}</div>;
 
   return (
     <main className="flex gap-96 h-screen px-64 py-32 text-white bg-background">
@@ -80,25 +80,13 @@ const GameInfo = () => {
                     src={handsModel[hand]}
                     alt={hand}
                     className="rounded-3xl transition-all duration-200"
-                    style={{
-                      filter: index > currentIndex ? "blur(30px)" : "none",
-                    }}
+                    style={{ filter: index > currentScore ? "blur(30px)" : "none" }}
                   />
                 </div>
+                {index}
+                {currentIndex}
 
-                <div
-                  className={`w-10 h-10 rounded-full bg-graphite ${
-                    index === currentIndex ? "bg-primary" : ""
-                  } transition-all`}
-                ></div>
-
-                {index < round.length - 1 && (
-                  <div
-                    className={`h-1 ${
-                      index === currentIndex ? "bg-primary" : "bg-graphite"
-                    } w-10`}
-                  ></div>
-                )}
+                <div className={`w-10 h-10 rounded-full bg-graphite ${index <= currentScore ? "bg-primary" : ""} transition-all`}></div>
               </div>
             ))}
           </div>
