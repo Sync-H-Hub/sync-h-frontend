@@ -1,5 +1,5 @@
 // src/components/GameInfo.js
-import handsModel from '@/models/handModel';
+import handsModel, { HandKeys } from '@/models/handModel';
 import React, { useEffect, useState } from 'react';
 
 const ENDPOINT = "ws://localhost:3000/websocket"; // Endpoint do WebSocket
@@ -9,7 +9,7 @@ const GameInfo = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState(null);
-  const [round, setRound] = useState([]);
+  const [round, setRound] = useState<HandKeys[]>(["hand_L"]); // Defina round como um array de HandKeys
   const [score, setScore] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0); // Índice do slider de rodadas
 
