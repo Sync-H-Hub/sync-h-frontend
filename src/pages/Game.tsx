@@ -26,6 +26,19 @@ const GameInfo = () => {
     socket.onmessage = (event) => {
       console.log(`Received message:`, event.data);
       setMessage(event.data);
+
+      try{
+        const jsonObject = JSON.parse(event.data)
+        if (jsonObject.body.rodada) {
+          try {
+            setRound(jsonObject.body.rodada)
+          } catch (error) {
+            console.error("Erro ao tentar mudar a rodada >> " + error)
+          }
+        }
+      } catch (error){
+        console.error("Erro ao tentar converter mensagem para objeto >> " + error)
+      }
     };
 
     // Evento ao encontrar um erro
