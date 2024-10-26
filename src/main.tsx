@@ -4,7 +4,8 @@ import './styles/index.css'
 import App from './App.tsx'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Menu from '@pages/Menu.tsx'
-import Tutorial from './pages/Tutorial.tsx'
+import Tutorial from '@pages/Tutorial.tsx'
+import Game from '@pages/Game.tsx'
 
 const router = createBrowserRouter([
   {
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
       {
         path: "/tutorial",
         element: <Tutorial/>
+      },
+      {
+        path: "/game",
+        element: <Game/>,
       }
     ]
   }
