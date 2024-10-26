@@ -1,26 +1,47 @@
 // src/components/GameInfo.js
 import React, { useEffect, useState } from 'react';
-import { io } from 'socket.io-client';
+
+const ENDPOINT = "ws://192.168.15.17:3000/websocket"; // Endpoint do WebSocket
 
 const GameInfo = () => {
   const [gameInfos, setGameInfos] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null); // Define o tipo do erro como string ou null
+  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
 
-  const ENDPOINT = "http://192.168.15.100:3000"
-  const [message, setMessage] = useState()
   useEffect(() => {
+    // Cria uma nova conexão WebSocket
+    const socket = new WebSocket(ENDPOINT);
 
-    const socket = io(ENDPOINT);
-    socket.on('message', (data) => {
-      console.log(`Receiveded message`, data)
-      setMessage(data.data)
-    })
+    // Evento ao abrir a conexão
+    socket.onopen = () => {
+      console.log('Connected to WebSocket server');
+    };
+
+    // Evento ao receber uma mensagem
+    socket.onmessage = (event) => {
+      console.log(`Received message:`, event.data);
+      setMessage(event.data);
+    };
+
+    // Evento ao encontrar um erro
+    socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+      setError('WebSocket connection error');
+    };
+
+    // Evento ao fechar a conexão
+    socket.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
+    // Limpeza ao desmontar o componente
     return () => {
-      socket.disconnect();
-    }
+      socket.close();
+    };
   }, []);
 
+  // Lógica de carregamento e erro
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
