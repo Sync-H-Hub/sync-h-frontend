@@ -7,13 +7,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: "rgba(39, 251, 233, 1)",
-        background: "rgba(26, 24, 27, 1)",
-        graphite: "rgba(32, 30, 34, 1)",
+        primary: "rgba(255, 68, 0, 1)",
+        background: "rgba(27, 9, 4, 1)",
+        graphite: "rgba(41, 21, 3, 1)",
         charcoal: "rgba(36, 34, 38, 1)",
       },
       backgroundImage: {
-        'primary-gradient': 'linear-gradient(90deg, rgba(30, 214, 255, 1) 0%, rgba(40, 255, 229, 1) 100%)',
+        'primary-gradient': 'linear-gradient(90deg, rgba(211, 102, 33, 1) 0%, rgba(252, 0, 71, 1) 100%)',
       },
     },
   },

@@ -12,7 +12,7 @@ interface Desafio {
 
 const GameInfo = () => {
   const [error, setError] = useState<string | null>(null);
-  const [round, setRound] = useState<HandKeys[]>([]);
+  const [round, setRound] = useState<HandKeys[]>(["A"]);
   const [score, setScore] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentScore, setCurrentScore] = useState(0);
@@ -24,7 +24,7 @@ const GameInfo = () => {
     };
     setCurrentScore(0)
     socket.onmessage = (event) => {
-      
+
       console.log(`Received message:`, event.data);
       try {
         const jsonObject = JSON.parse(event.data);
@@ -76,7 +76,7 @@ const GameInfo = () => {
         <div className="flex flex-col items-center">
           <div className="flex gap-4 items-center">
             {round.map((hand, index) => (
-              <div key={index} className="flex flex-col items-center">
+              <div key={index} className="flex flex-col items-center gap-16">
                 <div className="bg-graphite rounded-3xl p-4 transition-all hover:-translate-y-1 relative overflow-hidden">
                   <img
                     src={handsModel[hand]}
@@ -85,8 +85,6 @@ const GameInfo = () => {
                     style={{ filter: index > currentIndex - 1 ? "blur(40px)" : "none" }}
                   />
                 </div>
-                {index}
-                {currentIndex}
 
                 <div className={`w-10 h-10 rounded-full bg-graphite ${index < currentIndex ? "bg-primary" : ""} transition-all`}></div>
               </div>
@@ -94,12 +92,6 @@ const GameInfo = () => {
           </div>
         </div>
 
-        <button
-          onClick={() => setCurrentIndex((prev) => (prev + 1) % round.length)}
-          className="mt-4 bg-primary px-4 py-2 rounded text-white"
-        >
-          Avançar Rodada
-        </button>
       </section>
       <img src="/sync-h-letter.svg" alt="" className="absolute bottom-0 right-0 z-0" />
     </main>
